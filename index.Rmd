@@ -8,3 +8,82 @@ output:
 ---
 
 This is my JSC370 Final Project website.
+
+
+```{r setup, include = FALSE}
+source("process_starbucks_data.R")
+```
+
+## Showcasing plots {.tabset}
+
+### Figure 1
+
+```{r plot1, class.source="code-r-small", echo=FALSE, warning=FALSE}
+sb_nutr |>
+  plot_ly(x= ~Calories,
+          y= ~`Carb. (g)`,
+          type = 'scatter',
+          mode = 'markers',
+          color = ~Category
+          )
+```
+
+### Figure 2
+
+```{r plot2, class.source="code-r-small", echo=FALSE, warning=FALSE}
+top_words <- sb_nutr |>
+  unnest_tokens(word, Item, token="words") |>
+  count(word, sort=TRUE) |>
+  head(10)
+  
+
+filtered_data <- sb_nutr |>
+  unnest_tokens(word, Item, token = "words") |>
+  filter(word %in% top_words$word)
+
+filtered_data |>
+  plot_ly(x= ~Calories,
+          y= ~`Carb. (g)`,
+          type = 'scatter',
+          mode = 'markers',
+          color = ~Category,
+          hoverinfo = "text",
+          text = ~paste0("Item: ", word, sep="")
+          ) |>
+  layout(title = "Calories and carb scatterplot among items that contains a top 10 words",
+         xaxis = list(title = "Calories"),
+         yaxis = list(title = "Carbohydrates"),
+         hovermode = "compare"
+         )
+```
+
+### Figure 3
+
+```{r plot3, class.source="code-r-small", echo=FALSE, warning=FALSE}
+# Set up mapping details
+set_map_details <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('steelblue')
+)
+
+# Make sure both maps are on the same color scale
+shadeLimit <- 125
+
+# Create hover text
+sb_locs_state$hover <- with(sb_locs_state, paste("Number of Starbucks: ", n_stores, '<br>', "State: ", state.y, '<br>', "Population: ", population))
+
+# Create the map
+map1 <- plot_geo(sb_locs_state, locationmode='USA-states') |>
+  add_trace(z = ~n_stores, text = ~hover, locations = ~state, color = ~n_stores, colors = 'Purples') |>
+  layout(geo=set_map_details)
+
+map2 <- plot_geo(sb_locs_state, locationmode='USA-states') |>
+  add_trace(z = ~population, text = ~hover, locations = ~state, color = ~population, colors = 'Purples') |>
+  layout(title = "Populations and number of starbuck stores by state", geo=set_map_details)
+
+subplot(map1, map2)
+```
+
+{-}
