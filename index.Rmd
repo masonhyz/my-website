@@ -1,6 +1,6 @@
 ---
 title: "JSC370 Final Project"
-author: "Your Name"
+author: "Mason Hu"
 output: 
   html_document:
     toc: TRUE
@@ -10,7 +10,7 @@ output:
 This is my JSC370 Final Project website.
 
 
-```{r setup, include = FALSE}
+```{r setup, include=FALSE}
 source("process_starbucks_data.R")
 ```
 
@@ -25,7 +25,11 @@ sb_nutr |>
           type = 'scatter',
           mode = 'markers',
           color = ~Category
-          )
+          ) |>
+  layout(title = "Calories and carb scatterplot for Starbucks items",
+         xaxis = list(title = "Calories"),
+         yaxis = list(title = "Carbohydrates")
+         )
 ```
 
 ### Figure 2
